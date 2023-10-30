@@ -3,6 +3,7 @@ package com.project.eshop.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${api.version}/categories")
-// @RequestMapping("/api/v1/categories")
 @Validated
 @RequiredArgsConstructor
 public class CategoryController {
@@ -84,13 +85,22 @@ public class CategoryController {
         categoryService.updateCategory(id, categoryDTO);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Update category with id: " + id + " successfully");
+                .body("Successfully updated category with id: " + id);
     }
 
     // DeleteCategory
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
-        categoryService.deleteCategory(id);
-        return ResponseEntity.ok("Delete category with id: " + id + " successfully");
+        try {
+            categoryService.deleteCategory(id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("Delete category with id: " + id + " successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Category with id: " + id + " not found");
+        }
     }
 
 }

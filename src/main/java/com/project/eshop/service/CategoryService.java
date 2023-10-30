@@ -2,6 +2,8 @@ package com.project.eshop.service;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,6 @@ public class CategoryService implements ICategoryService {
         return categoryRepository.save(newCategory);
     }
 
-
     @Override
     public Category getCategory(Long id) {
         return categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
@@ -35,19 +36,24 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category updateCategory(Long id, CategoryDTO categoryDTO) {
-        Category updatedCategory = Category
-                .builder()
-                .id(id)
-                .name(categoryDTO.getName())
-                .build();
-        return categoryRepository.save(updatedCategory);
+        if (categoryDTO.getName() == null || categoryDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+        if (categoryRepository.existsById(id)) {
+            return categoryRepository.save(Category.builder().id(id).name(categoryDTO.getName()).build());
+        } else {
+            throw new EntityNotFoundException("This category ID does not exist: " + id);
+        }
     }
-
+    
     @Override
     public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+        if (categoryRepository.existsById(id)) {
+            categoryRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("ID " + id + " not exists");
+        }
     }
-
 
     @Override
     public Page<Category> getAllCategories(Pageable pageable) {
