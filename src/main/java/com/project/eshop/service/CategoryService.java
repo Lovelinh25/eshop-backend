@@ -1,9 +1,11 @@
 package com.project.eshop.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,9 +24,23 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category createCategory(CategoryDTO categoryDTO) {
+        String name = categoryDTO.getName();
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name category cannot be empty");
+        }
+        if (!name.matches("[\\p{L}0-9 ]*")) {
+            throw new IllegalArgumentException("Name category can only contain letters and numbers");
+        }
+        if (name.length() < 1 || name.length() > 20) {
+            throw new IllegalArgumentException("Name category must be between 1 and 20 characters");
+        }
+        Optional<Category> existingCategory = Optional.ofNullable(findCategory(name));
+        if (existingCategory.isPresent()) {
+            throw new IllegalArgumentException("Category '" + name + "' already exists");
+        }
         Category newCategory = Category
                 .builder()
-                .name(categoryDTO.getName())
+                .name(name)
                 .build();
         return categoryRepository.save(newCategory);
     }
@@ -36,21 +52,26 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category updateCategory(Long id, CategoryDTO categoryDTO) {
-        if (categoryDTO.getName() == null || categoryDTO.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be empty");
+        String name = categoryDTO.getName();
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name category cannot be empty");
         }
-        if (categoryRepository.existsById(id)) {
-            return categoryRepository.save(Category.builder().id(id).name(categoryDTO.getName()).build());
+        if (!name.matches("[\\p{L}0-9 ]*")) {
+            throw new IllegalArgumentException("Name category can only contain letters and numbers");
+        }
+        Optional<Category> existingCategory = categoryRepository.findById(id);
+        if (existingCategory.isPresent()) {
+            return categoryRepository.save(Category.builder().id(id).name(name).build());
         } else {
             throw new EntityNotFoundException("This category ID does not exist: " + id);
         }
     }
-    
+
     @Override
     public void deleteCategory(Long id) {
-        if (categoryRepository.existsById(id)) {
+        try {
             categoryRepository.deleteById(id);
-        } else {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("ID " + id + " not exists");
         }
     }

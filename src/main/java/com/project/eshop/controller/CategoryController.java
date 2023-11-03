@@ -7,6 +7,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,8 +40,7 @@ public class CategoryController {
 
     // CreateCategory
     @PostMapping
-    public ResponseEntity<?> createCategory(
-            @Valid @RequestBody CategoryDTO categoryDTO, BindingResult result) {
+    public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, BindingResult result) {
         if (result.hasErrors()) {
             List<String> errors = result.getAllErrors()
                     .stream()
@@ -48,17 +48,16 @@ public class CategoryController {
                     .collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errors);
         }
-        Category existingCategory = categoryService.findCategory(categoryDTO.getName());
-        if (existingCategory != null) {
-            return ResponseEntity.badRequest().body("Category '" + categoryDTO.getName() + "' already exists");
+        try {
+            categoryService.createCategory(categoryDTO);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Create category '" + categoryDTO.getName() + "' successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
-        if (categoryDTO.getName().isEmpty()) {
-            return ResponseEntity.badRequest().body("Category not empty");
-        }
-        categoryService.createCategory(categoryDTO);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Create category '" + categoryDTO.getName() + "' successfully");
     }
 
     // GetAllCategories
@@ -79,13 +78,17 @@ public class CategoryController {
 
     // UpdateCategory
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCategory(
-            @PathVariable Long id,
-            @Valid @RequestBody CategoryDTO categoryDTO) {
-        categoryService.updateCategory(id, categoryDTO);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body("Successfully updated category with id: " + id);
+    public ResponseEntity<String> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDTO) {
+        try {
+            categoryService.updateCategory(id, categoryDTO);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("Successfully updated category with id: " + id);
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
     }
 
     // DeleteCategory
@@ -96,11 +99,10 @@ public class CategoryController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body("Delete category with id: " + id + " successfully");
-        } catch (EntityNotFoundException e) {
+        } catch (EmptyResultDataAccessException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Category with id: " + id + " not found");
         }
     }
-
 }
