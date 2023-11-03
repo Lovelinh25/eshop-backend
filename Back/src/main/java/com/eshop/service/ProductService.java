@@ -12,8 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import java.util.Date;
 
+=======
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
 @Service
 public class ProductService implements IProductService {
 
@@ -33,13 +36,19 @@ public class ProductService implements IProductService {
     }
 
     public void createProduct(CreatingProductForm form){
+<<<<<<< HEAD
         form.setCreated_date(new Date(System.currentTimeMillis()));
+=======
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
         Product entity = modelMapper.map(form, Product.class);
         Product product = repository.save(entity);
     }
 
     public void updateProduct(UpdatingProductForm form){
+<<<<<<< HEAD
         form.setCreated_date(new Date(System.currentTimeMillis()));
+=======
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
         Product product = modelMapper.map(form, Product.class);
         repository.save(product);
     }

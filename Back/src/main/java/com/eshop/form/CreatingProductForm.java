@@ -8,7 +8,10 @@ import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+<<<<<<< HEAD
 import java.util.Date;
+=======
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
 import java.util.List;
 
 @Data
@@ -18,6 +21,7 @@ public class CreatingProductForm {
     @NotNull
     private String name;
 
+<<<<<<< HEAD
     @Positive(message = "Price must be greater than zero")
     private Double price;
 
@@ -31,4 +35,16 @@ public class CreatingProductForm {
     private String tradeMark;
 
 //    private List<ImageProduct> imageProducts;
+=======
+    @NotBlank(message = "Not blank")
+    @Positive(message = "Price must be greater than zero")
+    private Double price;
+
+    private  String description;
+
+    @NotBlank
+    private String tradeMark;
+
+    private List<ImageProduct> imageProducts;
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
 }

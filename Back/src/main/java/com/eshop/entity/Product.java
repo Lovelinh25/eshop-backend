@@ -1,7 +1,10 @@
 package com.eshop.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+<<<<<<< HEAD
 import org.hibernate.annotations.CreationTimestamp;
+=======
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,6 +22,7 @@ public class Product implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+<<<<<<< HEAD
     @Column(name = "name")
     private String name;
 
@@ -34,11 +38,22 @@ public class Product implements Serializable {
     private Integer quantity;
 
     @Column(name = "description")
+=======
+    private String name;
+
+    private Double price;
+
+    private Date createDate;
+
+    private Integer quantity;
+
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
     private  String description;
 
 //    @ManyToOne
 //    @JoinColumn(name = "category_id")
 //    private Category category;
+<<<<<<< HEAD
     @Column(name = "tradeMark")
     private String tradeMark;
 
@@ -46,5 +61,12 @@ public class Product implements Serializable {
 //    @JsonIgnore
 //    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
 //    private List<ImageProduct> imageProducts;
+=======
+    private String tradeMark;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ImageProduct> imageProducts;
+>>>>>>> 6b56a28734ec1f133efc451c6bfcc5aafd490a22
 
 }
