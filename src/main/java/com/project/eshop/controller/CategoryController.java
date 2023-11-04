@@ -32,7 +32,7 @@ import com.project.eshop.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${api.version}/categories")
+@RequestMapping("api/v1/categories")
 @Validated
 @RequiredArgsConstructor
 public class CategoryController {
